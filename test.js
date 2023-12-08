@@ -1,3 +1,3 @@
 let cadena=`Hola \n`;
 cadena+="Pablo";
-console.log(cadena);
+console.log(Number(0));

@@ -44,26 +44,27 @@ menuProductos+=`${codigoProducto4}-${nombreProducto4} $ ${precioProducto4}`;
 
 alert("Bienvenido a Pablo Winter Muebles");
 let input=0;
-while ((input=numberInput("Ingrese su numero de cliente, '0' para salir"))!=exitCode){
+while ((input=numberInput("Ingrese su numero de cliente, '0' o Escape para salir"))!=exitCode){
     let nombreCliente=buscarCliente(input);
     if (nombreCliente===null){
         continue;
     }
     alert(`Bienvenido ${nombreCliente}`);
     let total=0;
-    while ((input=numberInput("Seleccione el codigo de producto, '0' para salir\n" + menuProductos))!=exitCode){
+    while ((input=numberInput("Seleccione el codigo de producto, '0' Escape para salir\n" + menuProductos))!=exitCode){
         let producto=buscarProducto(input);
         if (producto===null){
             continue;
         }
         alert(`Ud Selecciono el producto ${producto}`);
-        let cantidad=numberInput("Ingrese la cantidad, '0' para salir");
+        let cantidad=numberInput("Ingrese la cantidad, '0' o Escape para salir");
         if (cantidad>0){
             let precio=buscarPrecio(input);
             total+=cantidad * precio;
         }
+        alert(`Total Parcial ${total}`)
     }
-    if (total>0){
+   /*  if (total>0){
         let formaPago="";
         let salir=false;
         while (!salir){
@@ -75,11 +76,9 @@ while ((input=numberInput("Ingrese su numero de cliente, '0' para salir"))!=exit
         if (formaPago===pagoContado){
             alert(`El total de su pago es $ ${total}`);
         }else{
-
+            //TODO CALCULO CUOTAS
         }
-        
-
-    }
+    } */
 }
 
 
