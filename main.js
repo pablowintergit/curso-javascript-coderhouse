@@ -78,6 +78,7 @@ while ((input=numberInput("Ingrese su numero de cliente, '0' para salir"))!=exit
         continue;
     }
     if (formaPago===pagoContado){
+        total=Math.round(total*100)/100;
         alert(`El total de su compra es $ ${total}`);
     }else{
         //"1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
@@ -179,6 +180,6 @@ function calcularMontoTotalEnCuotas(montoBase ,cuotas, calculoInteres){
         total+=montoConInteres;
         console.log(i);
     }
-
+    total=Math.round(total*100)/100;
     return total;
 }
