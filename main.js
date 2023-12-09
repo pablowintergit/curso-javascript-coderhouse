@@ -28,11 +28,11 @@ const pagoContado="CONTADO";
 const pagoCuotas="CUOTAS";
 
 //Cuotas
-const minimoCuota=1500;
-const interes3Cuotas=0.3;
-const interes6Cuotas=0.5;
-const interes12Cuotas=0.8;
-
+const interes1Cuotas=0.02;
+const interes3Cuotas=0.08;
+const interes6Cuotas=0.1;
+const interes12Cuotas=0.15;
+const opcionesCuotas="1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
 
 //Codigo de fin de programa
 const exitCode=0;
@@ -40,60 +40,86 @@ const exitCode=0;
 let menuProductos=`${codigoProducto1}-${nombreProducto1}  $ ${precioProducto1}\n`;
 menuProductos+=`${codigoProducto2}-${nombreProducto2}  $ ${precioProducto2}\n`;
 menuProductos+=`${codigoProducto3}-${nombreProducto3} $ ${precioProducto3}\n`;
-menuProductos+=`${codigoProducto4}-${nombreProducto4} $ ${precioProducto4}`;
+menuProductos+=`${codigoProducto4}-${nombreProducto4} $ ${precioProducto4}\n`;
 
 alert("Bienvenido a Pablo Winter Muebles");
 let input=0;
-while ((input=numberInput("Ingrese su numero de cliente, '0' o Escape para salir"))!=exitCode){
+while ((input=numberInput("Ingrese su numero de cliente, '0' para salir"))!=exitCode){
     let nombreCliente=buscarCliente(input);
     if (nombreCliente===null){
         continue;
     }
     alert(`Bienvenido ${nombreCliente}`);
     let total=0;
-    while ((input=numberInput("Seleccione el codigo de producto, '0' Escape para salir\n" + menuProductos))!=exitCode){
+    let totalParcial="";
+    while ((input=numberInput("Seleccione el codigo de producto, '0' para salir\n" + menuProductos + totalParcial))!=exitCode){
         let producto=buscarProducto(input);
         if (producto===null){
             continue;
         }
         alert(`Ud Selecciono el producto ${producto}`);
-        let cantidad=numberInput("Ingrese la cantidad, '0' o Escape para salir");
+        let cantidad=numberInput("Ingrese la cantidad, '0' para salir");
         if (cantidad>0){
             let precio=buscarPrecio(input);
             total+=cantidad * precio;
         }
-        alert(`Total Parcial ${total}`)
+        totalParcial=`Total Parcial : $ ${total}`;
     }
-   /*  if (total>0){
-        let formaPago="";
-        let salir=false;
-        while (!salir){
-           formaPago=prompt("Ingrese la forma de pago: CONTADO, CUOTAS"); 
-           if (formaPago.toUpperCase()===pagoContado || formaPago===pagoCuotas){
-                salir=true;
-           }
+    let formaPago="";
+    let salir=false;
+    while (!salir){
+        formaPago=prompt("Ingrese la forma de pago: CONTADO, CUOTAS, '0' para salir"); 
+        formaPago=formaPago.toUpperCase();
+        if (formaPago===pagoContado || formaPago===pagoCuotas || formaPago==="0" ){
+            salir=true;
         }
-        if (formaPago===pagoContado){
-            alert(`El total de su pago es $ ${total}`);
-        }else{
-            //TODO CALCULO CUOTAS
+    }
+    if (formaPago==="0"){
+        continue;
+    }
+    if (formaPago===pagoContado){
+        alert(`El total de su compra es $ ${total}`);
+    }else{
+        //"1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
+        let cuotas=0;
+        while (true){
+            cuotas=numberInput("Ingrese la cantidad de cuotas.\n" + opcionesCuotas);
+            if (cuotas!=1 && cuotas!=3 && cuotas!=6 && cuotas!=12){
+                alert("Numero de cuotas invalido");
+            }else{
+                break;
+            }
         }
-    } */
+        switch(cuotas){
+            case 1:
+                total=calcularMontoTotalEnCuotas(total,cuotas,e => e * (1 +interes1Cuotas));
+                break;
+            case 3:
+                total=calcularMontoTotalEnCuotas(total,cuotas,e => e * (1 +interes3Cuotas));
+                break;
+            case 6:
+                total=calcularMontoTotalEnCuotas(total,cuotas,e => e * (1 +interes6Cuotas));
+                break;
+            case 12:
+                total=calcularMontoTotalEnCuotas(total,cuotas,e => e * (1 +interes12Cuotas));
+                break;
+        }
+        alert(`El total de su compra en ${cuotas} cuotas es $ ${total}`);
+    }
 }
 
 
-
-
-
-
 function numberInput(mensaje){
-    let input=Number(prompt(mensaje));
+    let input=prompt(mensaje);
     
-    if (!isNaN(input)){
-        return input;
-    }else{
+    if (input===null || input.trim()===""){
+        alert("Ingrese '0' para salir");
+        return numberInput(mensaje);
+    }else if (isNaN(Number(input))){
         alert("Error!\nIngrese un numero");
         return numberInput(mensaje);
+    }else{
+        return Number(input);;
     }
 }
 
@@ -142,4 +168,17 @@ function buscarPrecio(codigoProducto){
         default:
             return 0;
     }
+}
+
+
+function calcularMontoTotalEnCuotas(montoBase ,cuotas, calculoInteres){
+    let total=0;
+    let montoMensualBase=montoBase/cuotas;
+    for(let i=1; i<=cuotas;i++){
+        let montoConInteres=calculoInteres(montoMensualBase);
+        total+=montoConInteres;
+        console.log(i);
+    }
+
+    return total;
 }
