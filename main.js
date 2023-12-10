@@ -35,7 +35,7 @@ const interes12Cuotas=0.15;
 const opcionesCuotas="1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
 
 //Codigo de fin de programa
-const exitCode=0;
+const exitCode="cancel";
 
 let menuProductos=`${codigoProducto1}-${nombreProducto1}  $ ${precioProducto1}\n`;
 menuProductos+=`${codigoProducto2}-${nombreProducto2}  $ ${precioProducto2}\n`;
@@ -44,7 +44,7 @@ menuProductos+=`${codigoProducto4}-${nombreProducto4} $ ${precioProducto4}\n`;
 
 alert("Bienvenido a Pablo Winter Muebles");
 let input=0;
-while ((input=numberInput("Ingrese su numero de cliente, '0' para salir"))!=exitCode){
+while ((input=numberInput("Ingrese su numero de cliente, cancelar para salir"))!=exitCode){
     let nombreCliente=buscarCliente(input);
     if (nombreCliente===null){
         continue;
@@ -52,29 +52,42 @@ while ((input=numberInput("Ingrese su numero de cliente, '0' para salir"))!=exit
     alert(`Bienvenido ${nombreCliente}`);
     let total=0;
     let totalParcial="";
-    while ((input=numberInput("Seleccione el codigo de producto, '0' para salir\n" + menuProductos + totalParcial))!=exitCode){
+    let canceloCargaPedidos=false;
+    while ((input=numberInput("Seleccione el codigo de producto, cancelar para salir\n" + menuProductos + totalParcial))!=exitCode){
         let producto=buscarProducto(input);
         if (producto===null){
             continue;
         }
         alert(`Ud Selecciono el producto ${producto}`);
-        let cantidad=numberInput("Ingrese la cantidad, '0' para salir");
-        if (cantidad>0){
-            let precio=buscarPrecio(input);
-            total+=cantidad * precio;
+        while ((input=numberInput("Ingrese la cantidad,cancelar para salir"))!=exitCode){
+            let cantidad=input;
+            if (cantidad>0){
+                let precio=buscarPrecio(input);
+                total+=cantidad * precio;
+            }else{
+                alert("La cantidad debe ser mayor a 0.");
+            }
         }
         totalParcial=`Total Parcial : $ ${total}`;
+    }
+    if (total===0){
+        alert("No se cargo ningun producto, volvera al menu inicial");
+        continue;
     }
     let formaPago="";
     let salir=false;
     while (!salir){
-        formaPago=prompt("Ingrese la forma de pago: CONTADO, CUOTAS, '0' para salir"); 
-        formaPago=formaPago.toUpperCase();
-        if (formaPago===pagoContado || formaPago===pagoCuotas || formaPago==="0" ){
+        formaPago=prompt("Ingrese la forma de pago: CONTADO, CUOTAS,cancelar para salir"); 
+        if (formaPago===exitCode){
             salir=true;
+        }else{
+            formaPago=formaPago.toUpperCase();
+            if (formaPago===pagoContado || formaPago===pagoCuotas){
+                salir=true;
+            }
         }
     }
-    if (formaPago==="0"){
+    if (formaPago===exitCode){
         continue;
     }
     if (formaPago===pagoContado){
@@ -110,17 +123,27 @@ while ((input=numberInput("Ingrese su numero de cliente, '0' para salir"))!=exit
 }
 
 
+function stringInput(mensaje){
+    let input=prompt(mensaje);
+
+    if (input===null){
+        return exitCode;
+    }else if (input.trim()===""){
+        alert("Debe Ingresar algun valor")
+        return stringInput(mensaje);
+    }
+}
+
 function numberInput(mensaje){
     let input=prompt(mensaje);
-    
-    if (input===null || input.trim()===""){
-        alert("Ingrese '0' para salir");
-        return numberInput(mensaje);
-    }else if (isNaN(Number(input))){
+
+    if (input===null){
+        return exitCode;
+    }else if (input.trim()==="" || isNaN(Number(input))){
         alert("Error!\nIngrese un numero");
         return numberInput(mensaje);
     }else{
-        return Number(input);;
+        return Number(input);
     }
 }
 
