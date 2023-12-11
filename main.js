@@ -194,7 +194,9 @@ function buscarPrecio(codigoProducto){
     }
 }
 
-
+//Esta funcion es solo a fines ilustrativos del ciclo for
+//Lo correcto seria calcular el interes multiplicando la cantidad
+//de cuotas por el interes
 function calcularMontoTotalEnCuotas(montoBase ,cuotas, calculoInteres){
     let total=0;
     let montoMensualBase=montoBase/cuotas;
