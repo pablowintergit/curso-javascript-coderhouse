@@ -195,7 +195,8 @@ function buscarPrecio(codigoProducto){
     }
 }
 
-
+//Esta funcion es a modo ilustrativo de implementacion del ciclo for
+//En realida bastaria multiplicar el valor de la cuota * el numero de cuotas
 function calcularMontoTotalEnCuotas(cuotas, valorCuota){
     let total=0;
     for(let i=1; i<=cuotas;i++){
