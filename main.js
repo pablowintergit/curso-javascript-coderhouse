@@ -58,12 +58,14 @@ while ((input=numberInput("Ingrese su numero de cliente, cancelar para salir"))!
         if (producto===null){
             continue;
         }
+        let codigoProducto=input;
         alert(`Ud Selecciono el producto ${producto}`);
         while ((input=numberInput("Ingrese la cantidad,cancelar para salir"))!=exitCode){
             let cantidad=input;
             if (cantidad>0){
-                let precio=buscarPrecio(input);
+                let precio=buscarPrecio(codigoProducto);
                 total+=cantidad * precio;
+                break;
             }else{
                 alert("La cantidad debe ser mayor a 0.");
             }
@@ -104,21 +106,20 @@ while ((input=numberInput("Ingrese su numero de cliente, cancelar para salir"))!
                 break;
             }
         }
-        switch(cuotas){
-            case 1:
-                total=calcularMontoTotalEnCuotas(total,cuotas,e => e * (1 +interes1Cuotas));
-                break;
-            case 3:
-                total=calcularMontoTotalEnCuotas(total,cuotas,e => e * (1 +interes3Cuotas));
-                break;
-            case 6:
-                total=calcularMontoTotalEnCuotas(total,cuotas,e => e * (1 +interes6Cuotas));
-                break;
-            case 12:
-                total=calcularMontoTotalEnCuotas(total,cuotas,e => e * (1 +interes12Cuotas));
-                break;
+        let valorCuota=0;
+        const calculoCuota=(monto,cuotas,interes)=> (monto/cuotas) * (1 + interes);
+        if (cuotas===1){
+            valorCuota=calculoCuota(total,1,interes1Cuotas);
+        }else if(cuotas===3){
+            valorCuota=calculoCuota(total,3,interes3Cuotas);
+        }else if(cuotas===6){
+            valorCuota=calculoCuota(total,6,interes6Cuotas);
+        }else if (cuotas===12){
+            valorCuota=calculoCuota(total);
         }
-        alert(`El total de su compra en ${cuotas} cuotas es $ ${total}`);
+        valorCuota=Math.round(valorCuota*100)/100;
+        total=calcularMontoTotalEnCuotas(cuotas,valorCuota);
+        alert(`El total de su compra en ${cuotas} cuotas de $ ${valorCuota} es $ ${total}`);
     }
 }
 
@@ -194,17 +195,13 @@ function buscarPrecio(codigoProducto){
     }
 }
 
-//Esta funcion es solo a fines ilustrativos del ciclo for
-//Lo correcto seria calcular el interes multiplicando la cantidad
-//de cuotas por el interes
-function calcularMontoTotalEnCuotas(montoBase ,cuotas, calculoInteres){
+
+function calcularMontoTotalEnCuotas(cuotas, valorCuota){
     let total=0;
-    let montoMensualBase=montoBase/cuotas;
     for(let i=1; i<=cuotas;i++){
-        let montoConInteres=calculoInteres(montoMensualBase);
-        total+=montoConInteres;
-        console.log(i);
+        total+=valorCuota;
     }
+
     total=Math.round(total*100)/100;
     return total;
 }
