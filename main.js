@@ -4,6 +4,20 @@ class Usuario{
         this.nombre=nombre;
         this.password=password;
     }
+
+    equals (usuario){
+        if (!usuario instanceof Usuario){
+            return false;
+        }
+        for (const key in this) {
+            if (Object.hasOwnProperty.call(this, key)) {
+                if (this[key]!=usuario[key]){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
 
 class Cliente{
@@ -42,6 +56,8 @@ const clientes=[
     new Cliente(30,"Maria Garcia",new Usuario("maru","4578")),
     new Cliente(40,"Alejandra Rodriguez",new Usuario("ale","laprida"))
 ]
+
+
 //Productos
 const productos=[
     new Producto(100,"Cama Beta Line 1 plaza",3500),
@@ -63,6 +79,7 @@ const intereses=[
     new Intereres(6,0.1),
     new Intereres(12,0.15)
 ]
+
 //Funciones de uso comun
 const sortAsc=(a,b)=>{
     if (a>b){
@@ -73,6 +90,7 @@ const sortAsc=(a,b)=>{
         return 0;
     }
 }
+
 const sortDesc=(a,b)=>{
     if (a>b){
         return -1;
@@ -83,34 +101,111 @@ const sortDesc=(a,b)=>{
     }
 }
 
-const opcionesCuotas="1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
+function stringInput(mensaje){
+    let input=prompt(mensaje);
 
+    if (input===null){
+        return exitCode;
+    }else if (input.trim()===""){
+        alert("Debe Ingresar algun valor")
+        return stringInput(mensaje);
+    }
+}
+
+function numberInput(mensaje){
+    let input=prompt(mensaje);
+
+    if (input===null){
+        return exitCode;
+    }else if (input.trim()==="" || isNaN(Number(input))){
+        alert("Error!\nIngrese un numero");
+        return numberInput(mensaje);
+    }else{
+        return Number(input);
+    }
+}
+
+function findClienteByUsuario(usuario){
+    return clientes.find(c=> c.usuario.equals(usuario));
+}
+
+function login(intentos=1){
+    let input=stringInput("Ingrese su nombre de usuario");
+    if (input==exitCode) return exitCode;
+    let username=input;
+    input=stringInput("Ingrese su contraseña");
+    if (input==exitCode) return exitCode;
+    let pass=input;
+    let cliente=findClienteByUsuario(new Usuario(username,pass));
+    if (cliente!=null){
+        return cliente;
+    }else{
+        alert("Usuario no existe");
+        if (intentos<5){
+            login(intentos+1);
+        }else{
+            alert("Demasiados intentos , usuario bloqueado");
+            return exitCode;
+        }
+    }
+}
+
+
+function productSearch(mensaje){    
+    switch (codigoProducto){
+        case codigoProducto1:
+            return nombreProducto1;
+        case codigoProducto2:
+            return nombreProducto2;
+        case codigoProducto3:
+            return nombreProducto3;
+        case codigoProducto4:
+            return nombreProducto4;
+        default:
+            alert("Producto Inexistente");
+            return null;
+    }
+}
+
+
+
+//Esta funcion es a modo ilustrativo de implementacion del ciclo for
+//En realida bastaria multiplicar el valor de la cuota * el numero de cuotas
+function calcularMontoTotalEnCuotas(cuotas, valorCuota){
+    let total=0;
+    for(let i=1; i<=cuotas;i++){
+        total+=valorCuota;
+    }
+
+    total=Math.round(total*100)/100;
+    return total;
+}
+
+
+
+//Constantes
+const opcionesCuotas="1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
 //Codigo de fin de programa
 const exitCode="cancel";
 
 //Configuracion inicial
-
-
 const productosDestacados=productos.filter(p=> p.destacado).sort((a,b)=>sortAsc(a.nombre,b.nombre));
-let menuProductos=productosDestacados.reduce((a,b)=>a+=`${b.codigo}-${b.nombre}  $ ${b.precio}\n`,"Productos Destacados\n") 
+let productosDestacadosString=productosDestacados.reduce((a,b)=>a+=`${b.codigo}-${b.nombre}  $ ${b.precio}\n`,"Productos Destacados\n") 
 
 
 alert("Bienvenido a Pablo Winter Muebles");
 let input=0;
-while ((input=numberInput("Ingrese su numero de cliente, cancelar para salir"))!=exitCode){
-    let nombreCliente=buscarCliente(input);
-    if (nombreCliente===null){
-        continue;
-    }
-    alert(`Bienvenido ${nombreCliente}`);
+while ((input=login())!=exitCode){
+    let cliente=input;
+    alert(`Bienvenido ${cliente.nombre}`);
     let total=0;
     let totalParcial="";
+    let menuProductos="";
     let canceloCargaPedidos=false;
-    while ((input=numberInput("Seleccione el codigo de producto, cancelar para salir\n" + menuProductos + totalParcial))!=exitCode){
-        let producto=buscarProducto(input);
-        if (producto===null){
-            continue;
-        }
+    alert(productosDestacadosString);
+    while ((input=productSearch("Seleccione el codigo de producto, cancelar para salir\n" + menuProductos + totalParcial))!=exitCode){
+        let producto=input;
+        //---
         let codigoProducto=input;
         alert(`Ud Selecciono el producto ${producto}`);
         while ((input=numberInput("Ingrese la cantidad,cancelar para salir"))!=exitCode){
@@ -177,85 +272,4 @@ while ((input=numberInput("Ingrese su numero de cliente, cancelar para salir"))!
 }
 
 
-function stringInput(mensaje){
-    let input=prompt(mensaje);
 
-    if (input===null){
-        return exitCode;
-    }else if (input.trim()===""){
-        alert("Debe Ingresar algun valor")
-        return stringInput(mensaje);
-    }
-}
-
-function numberInput(mensaje){
-    let input=prompt(mensaje);
-
-    if (input===null){
-        return exitCode;
-    }else if (input.trim()==="" || isNaN(Number(input))){
-        alert("Error!\nIngrese un numero");
-        return numberInput(mensaje);
-    }else{
-        return Number(input);
-    }
-}
-
-function buscarCliente(numeroCliente){
-    switch (numeroCliente){
-        case numeroCliente1:
-            return nombreCliente1;
-        case numeroCliente2:
-            return nombreCliente2;
-        case numeroCliente3:
-            return nombreCliente3;
-        case numeroCliente4:
-            return nombreCliente4;
-        default:
-            alert("Cliente Inexistente");
-            return null;
-    }
-}
-
-function buscarProducto(codigoProducto){    
-    switch (codigoProducto){
-        case codigoProducto1:
-            return nombreProducto1;
-        case codigoProducto2:
-            return nombreProducto2;
-        case codigoProducto3:
-            return nombreProducto3;
-        case codigoProducto4:
-            return nombreProducto4;
-        default:
-            alert("Producto Inexistente");
-            return null;
-    }
-}
-
-function buscarPrecio(codigoProducto){
-    switch (codigoProducto){
-        case codigoProducto1:
-            return precioProducto1;
-        case codigoProducto2:
-            return precioProducto2;
-        case codigoProducto3:
-            return precioProducto3;
-        case codigoProducto4:
-            return precioProducto4;
-        default:
-            return 0;
-    }
-}
-
-//Esta funcion es a modo ilustrativo de implementacion del ciclo for
-//En realida bastaria multiplicar el valor de la cuota * el numero de cuotas
-function calcularMontoTotalEnCuotas(cuotas, valorCuota){
-    let total=0;
-    for(let i=1; i<=cuotas;i++){
-        total+=valorCuota;
-    }
-
-    total=Math.round(total*100)/100;
-    return total;
-}
