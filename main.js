@@ -150,21 +150,45 @@ function login(intentos=1){
     }
 }
 
+const formaBusqueda="Buscar por :\n1-Codigo\n2-Nombre\n3-Precio\n4-Todos";
 
 function productSearch(mensaje){    
-    switch (codigoProducto){
-        case codigoProducto1:
-            return nombreProducto1;
-        case codigoProducto2:
-            return nombreProducto2;
-        case codigoProducto3:
-            return nombreProducto3;
-        case codigoProducto4:
-            return nombreProducto4;
-        default:
-            alert("Producto Inexistente");
-            return null;
+    mensaje+=formaBusqueda;
+    let input=numberInput(mensaje);
+    if (input===exitCode) return exitCode;
+    let productosFiltrados=[];
+    if (input===1){
+        input=numberInput("Ingrese el codigo a buscar");
+        if (input===exitCode) return exitCode;
+        productosFiltrados=productos.filter(p=> p.codigo===input);
+    }else if (input===2){
+        if (input===exitCode) return exitCode;
+        input=stringInput("Ingrese el nombre o parte del nombre a buscar");
+        while (input.length<3 && input!=exitCode){
+            alert("Debe ingresar al menos 3 caracteres");
+        }
+        if (input===exitCode) return exitCode;
+        productosFiltrados=productos.filter(p=> p.nombre.toLowerCase.includes(input));
+    }else if (input===3){
+        let precioDesde=numberInput("Ingrese el precio desde");
+        if (precioDesde===exitCode) return exitCode;
+        let precioHasta=numberInput("Ingrese el precio hasta");
+        if (precioHasta===exitCode) return exitCode;
+        productosFiltrados.filter(p=> p.precio>=precioDesde && p.precio<=precioHasta);
+    }else{
+        productosFiltrados=productos.slice();
     }
+
+    if (productosFiltrados.length>0){
+        return productosFiltrados;
+    }else{
+        if (confirm("No se encontraron resultados\n¿Desea continuar")){
+            return productSearch(mensaje);
+        }else{
+            return exitCode;
+        }
+    }
+
 }
 
 
@@ -203,7 +227,7 @@ while ((input=login())!=exitCode){
     let menuProductos="";
     let canceloCargaPedidos=false;
     alert(productosDestacadosString);
-    while ((input=productSearch("Seleccione el codigo de producto, cancelar para salir\n" + menuProductos + totalParcial))!=exitCode){
+    while ((input=productSearch("Busqueda de Productos\n" + menuProductos + totalParcial))!=exitCode){
         let producto=input;
         //---
         let codigoProducto=input;
