@@ -40,25 +40,13 @@ class Producto{
     }
 }
 
-class ItemCompra {
-    constructor(producto,cantidad){
-        this.producto=producto;
-        this.cantidad=cantidad;
-        this.importe=producto.precio*cantidad;
-    }
-    show(){
-        return `${this.producto.show()} - Cant. ${this.cantidad} - Importe $ ${this.importe}`
-    }
-}
-
-
 class FormaPago{
     constructor(codigo,nombre){
         this.codigo=codigo;
         this.nombre=nombre;
     }
 }
-class Intereres{
+class Interes{
     constructor(cantCuotas,interes){
         this.cantCuotas=cantCuotas;
         this.interes=interes;
@@ -68,31 +56,55 @@ class Intereres{
 class Carrito{
     constructor(){
         this.items=[];
-        this.total=0.0;
     }
 
+    existeProducto(producto){
+        return this.items.find(p=> p.codigo===producto.codigo)!=null;
+    }
 
-    //TODO: Ver si esta en el carrito
-    //refactorizar con items
     addProduct(producto,cantidad){
-        /* this.total+=producto.precio*cantidad;
-        this.productos.push(producto); */
+        let item=this.items.find(i=> i.codigo===producto.codigo);
+        if (item==null){
+            item=new ItemCompra(producto,cantidad);
+            this.items.push(item);
+        }else{
+            item.cantidad+=cantidad;
+        }
     }
 
-    //TODO: Ver si esta en el carrito
-    //refactorizar con items
     removeProduct(producto,cantidad){
-        //this.total-=producto.precio*cantidad;
-        //todo remover con splice
+        let item=this.items.find(i=> i.codigo===producto.codigo);
+        if (item==null){
+            return null;
+        }else{
+            let index=this.items.indexOf(item);
+            this.items.splice(index,1);
+            return item;
+        }
     }
 
     get roundedTotal(){
+        let total=0;
+        this.items.forEach(item=> total+=item.Importe);
         round(this.total,2);
     }
 
 }
 
+class ItemCompra {
+    constructor(producto,cantidad){
+        this.producto=producto;
+        this.cantidad=cantidad;
+    }
 
+    get Importe(){
+        return round(this.producto.precio * this.cantidad,2);
+    }
+
+    show(){
+        return `${this.producto.show()} - Cant. ${this.cantidad} - Importe $ ${this.Importe}`
+    }
+}
 
 //Base de Datos
 //Clientes
@@ -106,12 +118,12 @@ const clientes=[
 
 //Productos
 const productos=[
-    new Producto(100,"Cama Beta Line 1 plaza",3500),
-    new Producto(200,"Mesa de Luz de nogal",2300.40,true),
-    new Producto(300,"Cama de 1 plaza de nogal Sweet Dreams 2 plazas",1000),
-    new Producto(400,"Cama Confort Line 1 plaza",2300,true),
-    new Producto(500,"Modular de Algarrobo con 3 puertas",3000.50),
-    new Producto(600,"Cómoda Génova de 3 - 6 - 9 cajones",2700,true),
+    new Producto(100,"Cama Beta Line 1 plaza",10),
+    new Producto(200,"Mesa de Luz de nogal",10,true),
+    new Producto(300,"Cama de 1 plaza de nogal Sweet Dreams 2 plazas",10),
+    new Producto(400,"Cama Confort Line 1 plaza",10,true),
+    new Producto(500,"Modular de Algarrobo con 3 puertas",10),
+    new Producto(600,"Cómoda Génova de 3 - 6 - 9 cajones",10,true),
 ]
 //Formas de Pago
 const formasPago=[
@@ -120,10 +132,10 @@ const formasPago=[
 ]
 //Intereses
 const intereses=[
-    new Intereres(1,0.02),
-    new Intereres(3,0.08),
-    new Intereres(6,0.1),
-    new Intereres(12,0.15)
+    new Interes(1,0.02),
+    new Interes(3,0.08),
+    new Interes(6,0.1),
+    new Interes(12,0.15)
 ]
 
 
@@ -200,12 +212,11 @@ function login(intentos=1){
 
 function round(numero, digits){
     let factor=Math.pow(10,digits);
-    
     return Math.round(numero*factor)/factor;
  
  }
 
-const productosShow = function(callback,valorInicial="") {
+const arrayShow = function(callback,valorInicial="") {
     let cadena="";
 
     cadena=this.reduce((a,b)=>a+=b.show() + "\n" ,valorInicial);
@@ -272,14 +283,21 @@ function productSearch(mensaje){
 
 //Esta funcion es a modo ilustrativo de implementacion del ciclo for
 //En realida bastaria multiplicar el valor de la cuota * el numero de cuotas
-function calcularMontoTotalEnCuotas(cuotas, valorCuota){
+function calcularMontoTotalEnCuotas(monto,cuotas, calculoCuotas){
     let total=0;
+    let resultado={valorCuota:0.0,total:0.0};
+    let valorCuota=0.0;
     for(let i=1; i<=cuotas;i++){
+        valorCuota=calculoCuotas(monto,cuotas);
         total+=valorCuota;
+        if (i===1){
+            resultado.valorCuota=valorCuota;   
+        }
     }
 
-    total=Math.round(total*100)/100;
-    return total;
+    total=round(total,2);
+    resultado.total=total;
+    return resultado;
 }
 
 
@@ -290,7 +308,7 @@ const exitCode="cancel";
 
 //Configuracion inicial
 const productosDestacados=productos.filter(p=> p.destacado).sort((a,b)=>sortAsc(a.nombre,b.nombre));
-let productosDestacadosString=productosDestacados.productosShow=productosShow; 
+let productosDestacadosString=productosDestacados.productosShow=arrayShow; 
 productosDestacados="Estos son los productos destacados de la semana\n" + productosDestacados.productosShow(this,"Productos Destacados\n");
 
 alert("Bienvenido a Pablo Winter Muebles");
@@ -300,15 +318,19 @@ while ((input=login())!=exitCode){
     alert(`Bienvenido ${cliente.nombre}\n` + productosDestacados);
     let total=0;
     let totalParcial="";
-    let carrito=null;
+    let carrito=new Carrito();
+    carrito.items.show=arrayShow;
     let canceloCargaPedidos=false;
     let exit=false;
     while (exit===false){
         let productosEncontrados=productSearch("Busqueda de Productos");
-        if (carrito!=null && carrito.productos.length>0){
-
+        let productosSelec="";
+        let totalSelecc="";
+        if (carrito.items.length>0){
+            productosSelec=carrito.items.show(this,"Productos Seleccionados");
+            totalSelecc=`${carrito.roundedTotal()}`;
         }
-        while ((input=numberInput("Ingrese el codigo del Producto"))!=exitCode){
+        while ((input=numberInput("Ingrese el codigo del Producto" + productosSelec + "\n" + totalSelecc))!=exitCode){
             let tmpProd;
             if (productosEncontrados!=exitCode){
                 tmpProd=productosEncontrados;
@@ -320,11 +342,21 @@ while ((input=login())!=exitCode){
 
             if (producto!=null){
                 alert(`Ud Selecciono el producto ${producto.show()}`);
+                
+                if (carrito.existeProducto(producto)){
+                    if (!confirm("El producto ya esta en el carrito de compras\n¿Desea agregar mas unidades?")){
+                        if (confirm("¿Desea eleminarlo del carrito?")){
+                            carrito.items.removeProduct(producto);
+                        }
+                        continue;
+                    }
+                }
+
                 while ((input=numberInput("Ingrese la cantidad,cancelar para salir"))!=exitCode){
                     let cantidad=input;
                     if (cantidad>0){
                         if (carrito==null){
-                            carrito=new Carrito();
+                           
                         }
                         carrito.addProduct(producto,cantidad);
                         break;
@@ -337,19 +369,20 @@ while ((input=login())!=exitCode){
 
         }
     }
-    if (total===0){
+    if (carrito.items.length===0){
         alert("No se cargo ningun producto, volvera al menu inicial");
         continue;
+    }else if (confirm("¿Confirma la compra?")===false){
+        continue;
     }
-    let formaPago="";
+    let formaPago=null;
     let salir=false;
     while (!salir){
-        formaPago=prompt("Ingrese la forma de pago: CONTADO, CUOTAS,cancelar para salir"); 
-        if (formaPago===exitCode){
+        input=numberInput("Ingrese la forma de pago:1-CONTADO, 2-CUOTAS,cancelar para salir"); 
+        if (input===exitCode){
             salir=true;
         }else{
-            formaPago=formaPago.toUpperCase();
-            if (formaPago===pagoContado || formaPago===pagoCuotas){
+            if ((formaPago=formasPago.find(f=> f.codigo===input))!=null){
                 salir=true;
             }
         }
@@ -357,9 +390,8 @@ while ((input=login())!=exitCode){
     if (formaPago===exitCode){
         continue;
     }
-    if (formaPago===pagoContado){
-        total=Math.round(total*100)/100;
-        alert(`El total de su compra es $ ${total}`);
+    if (formaPago.codigo===1){
+        alert(`El total de su compra es $ ${carrito.roundedTotal()}`);
     }else{
         //"1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
         let cuotas=0;
@@ -371,20 +403,11 @@ while ((input=login())!=exitCode){
                 break;
             }
         }
-        let valorCuota=0;
-        const calculoCuota=(monto,cuotas,interes)=> (monto/cuotas) * (1 + interes);
-        if (cuotas===1){
-            valorCuota=calculoCuota(total,1,interes1Cuotas);
-        }else if(cuotas===3){
-            valorCuota=calculoCuota(total,3,interes3Cuotas);
-        }else if(cuotas===6){
-            valorCuota=calculoCuota(total,6,interes6Cuotas);
-        }else if (cuotas===12){
-            valorCuota=calculoCuota(total);
-        }
-        valorCuota=Math.round(valorCuota*100)/100;
-        total=calcularMontoTotalEnCuotas(cuotas,valorCuota);
-        alert(`El total de su compra en ${cuotas} cuotas de $ ${valorCuota} es $ ${total}`);
+        let interes=intereses.find(i=>i.cantCuotas===cuotas).map(i=> i.interes);
+        
+        const calculoCuota=(monto,cuotas)=> (monto/cuotas) * (1 + interes);
+        let resultado=calcularMontoTotalEnCuotas(carrito.roundedTotal,cuotas,calculoCuota);
+        alert(`El total de su compra en ${cuotas} cuotas de $ ${resultado.valorCuota} es $ ${resultado.total}`);
     }
 }
 
