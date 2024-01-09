@@ -1,15 +1,24 @@
 //Clases
+class Usuario{
+    constructor(nombre,password){
+        this.nombre=nombre;
+        this.password=password;
+    }
+}
+
 class Cliente{
-    constructor(id,nombre){
+    constructor(id,nombre,usuario){
         this.id=id;
         this.nombre=nombre;
+        this.usuario=usuario;
     }
 }
 class Producto{
-    constructor(codigo,nombre,precio){
+    constructor(codigo,nombre,precio,destacado=false){
         this.codigo=codigo;
         this.nombre=nombre;
         this.precio=precio;
+        this.destacado=destacado;
     }
 }
 class FormaPago{
@@ -28,19 +37,19 @@ class Intereres{
 //Base de Datos
 //Clientes
 const clientes=[
-    new Cliente(10,"Juan Rodriguez"),
-    new Cliente(20,"Carlos Acuña"),
-    new Cliente(30,"Maria Garcia"),
-    new Cliente(40,"Alejandra Rodriguez")
+    new Cliente(10,"Juan Rodriguez",new Usuario("juanro","abcd")),
+    new Cliente(20,"Carlos Acuña",new Usuario("carlitos20","1234")),
+    new Cliente(30,"Maria Garcia",new Usuario("maru","4578")),
+    new Cliente(40,"Alejandra Rodriguez",new Usuario("ale","laprida"))
 ]
 //Productos
 const productos=[
     new Producto(100,"Cama Beta Line 1 plaza",3500),
-    new Producto(200,"Mesa de Luz de nogal",2300.40),
+    new Producto(200,"Mesa de Luz de nogal",2300.40,true),
     new Producto(300,"Cama de 1 plaza de nogal Sweet Dreams 2 plazas",1000),
-    new Producto(400,"Cama Beta Line 1 plaza"),
-    new Producto(400,"Modular de Algarrobo con 3 puertas",3000.50),
-    new Producto(500,"Cómoda Génova de 3 - 6 - 9 cajones"),
+    new Producto(400,"Cama Confort Line 1 plaza",2300,true),
+    new Producto(500,"Modular de Algarrobo con 3 puertas",3000.50),
+    new Producto(600,"Cómoda Génova de 3 - 6 - 9 cajones",2700,true),
 ]
 //Formas de Pago
 const formasPago=[
@@ -54,17 +63,37 @@ const intereses=[
     new Intereres(6,0.1),
     new Intereres(12,0.15)
 ]
-
+//Funciones de uso comun
+const sortAsc=(a,b)=>{
+    if (a>b){
+        return 1;
+    }else if (a<b){
+        return -1;
+    }else{
+        return 0;
+    }
+}
+const sortDesc=(a,b)=>{
+    if (a>b){
+        return -1;
+    }else if (a<b){
+        return 1;
+    }else{
+        return 0;
+    }
+}
 
 const opcionesCuotas="1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
 
 //Codigo de fin de programa
 const exitCode="cancel";
 
-let menuProductos=`${codigoProducto1}-${nombreProducto1}  $ ${precioProducto1}\n`;
-menuProductos+=`${codigoProducto2}-${nombreProducto2}  $ ${precioProducto2}\n`;
-menuProductos+=`${codigoProducto3}-${nombreProducto3} $ ${precioProducto3}\n`;
-menuProductos+=`${codigoProducto4}-${nombreProducto4} $ ${precioProducto4}\n`;
+//Configuracion inicial
+
+
+const productosDestacados=productos.filter(p=> p.destacado).sort((a,b)=>sortAsc(a.nombre,b.nombre));
+let menuProductos=productosDestacados.reduce((a,b)=>a+=`${b.codigo}-${b.nombre}  $ ${b.precio}\n`,"Productos Destacados\n") 
+
 
 alert("Bienvenido a Pablo Winter Muebles");
 let input=0;
