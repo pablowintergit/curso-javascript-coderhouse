@@ -59,21 +59,30 @@ class Carrito{
     }
 
     existeProducto(producto){
-        return this.items.find(p=> p.codigo===producto.codigo)!=null;
+        return this.items.find(i=> i.producto.codigo===producto.codigo)!=null;
     }
 
     addProduct(producto,cantidad){
-        let item=this.items.find(i=> i.codigo===producto.codigo);
+        let item=this.items.find(i=> i.producto.codigo===producto.codigo);
         if (item==null){
             item=new ItemCompra(producto,cantidad);
             this.items.push(item);
         }else{
-            item.cantidad+=cantidad;
+            if (cantidad>0){
+                item.cantidad+=cantidad;
+            }else{
+                let tmpCantidad=item.cantidad+cantidad;
+                if (tmpCantidad<=0){
+                    alert("La cantidad del producto debe ser mayor a cero");
+                }else{
+                    item.cantidad+=cantidad;
+                }
+            }
         }
     }
 
     removeProduct(producto,cantidad){
-        let item=this.items.find(i=> i.codigo===producto.codigo);
+        let item=this.items.find(i=> i.producto.codigo===producto.codigo);
         if (item==null){
             return null;
         }else{
@@ -119,11 +128,11 @@ const clientes=[
 //Productos
 const productos=[
     new Producto(100,"Cama Beta Line 1 plaza",10),
-    new Producto(200,"Mesa de Luz de nogal",10,true),
-    new Producto(300,"Cama de 1 plaza de nogal Sweet Dreams 2 plazas",10),
-    new Producto(400,"Cama Confort Line 1 plaza",10,true),
-    new Producto(500,"Modular de Algarrobo con 3 puertas",10),
-    new Producto(600,"Cómoda Génova de 3 - 6 - 9 cajones",10,true),
+    new Producto(200,"Mesa de Luz de nogal",15,true),
+    new Producto(300,"Cama de 1 plaza de nogal Sweet Dreams 2 plazas",20),
+    new Producto(400,"Cama Confort Line 1 plaza",30,true),
+    new Producto(500,"Modular de Algarrobo con 3 puertas",40),
+    new Producto(600,"Cómoda Génova de 3 - 6 - 9 cajones",50,true),
 ]
 //Formas de Pago
 const formasPago=[
@@ -226,7 +235,7 @@ const arrayShow = function(callback,valorInicial="") {
 
 }
 
-const formaBusqueda="Buscar por :\n1-Codigo\n2-Nombre\n3-Precio\n4-Todos";
+const formaBusqueda="Buscar por :\n1-Nombre\n2-Precio\n3-Todos";
 
 function findProductByCodigo(codigo){
     if (productos.length===0){
@@ -238,18 +247,10 @@ function findProductByCodigo(codigo){
 
 
 function productSearch(mensaje){    
-    mensaje+=formaBusqueda;
-    let input=numberInput(mensaje);
+    let input=numberInput(mensaje+formaBusqueda);
     if (input===exitCode) return exitCode;
     let productosFiltrados=[];
-    if (input===1){
-        input=numberInput("Ingrese el codigo a buscar");
-        if (input===exitCode) return exitCode;
-        let producto=findProductByCodigo(input);
-        if (producto!=null){
-            productosFiltrados.push(producto);
-        }
-    }else if (input===2){;
+    if (input===1){;
         while ((input=stringInput("Ingrese el nombre o parte del nombre a buscar"))!=exitCode){
             if (input.trim().length<3){
                 alert("Debe ingresar al menos 3 caracteres");
@@ -259,12 +260,12 @@ function productSearch(mensaje){
         }
         if (input===exitCode) return exitCode;
         productosFiltrados=productos.filter(p=> p.nombre.toLowerCase().includes(input));
-    }else if (input===3){
+    }else if (input===2){
         let precioDesde=numberInput("Ingrese el precio desde");
         if (precioDesde===exitCode) return exitCode;
         let precioHasta=numberInput("Ingrese el precio hasta");
         if (precioHasta===exitCode) return exitCode;
-        productosFiltrados.filter(p=> p.precio>=precioDesde && p.precio<=precioHasta);
+        productosFiltrados=productos.filter(p=> p.precio>=precioDesde && p.precio<=precioHasta);
     }else{
         productosFiltrados=productos.slice();
     }
@@ -324,7 +325,7 @@ while ((input=login())!=exitCode){
     let canceloCargaPedidos=false;
     let exit=false;
     while (exit===false){
-        input=productSearch("Busqueda de Productos");
+        input=productSearch("Busqueda de Productos\n");
         if (input===exitCode){
             exit=true;
             continue;
@@ -338,15 +339,22 @@ while ((input=login())!=exitCode){
         let totalSelecc="";
         while ((input=numberInput("Ingrese el codigo del Producto\n" + productosSelec + "\n" + totalSelecc))!=exitCode){
             let producto=productos.find(p=> p.codigo===input);
-
+            let operador=1;
             if (producto!=null){
                 alert(`Ud Selecciono el producto ${producto.show()}`);
-                
                 if (carrito.existeProducto(producto)){
-                    if (!confirm("El producto ya esta en el carrito de compras\n¿Desea agregar mas unidades?")){
-                        if (confirm("¿Desea eleminarlo del carrito?")){
-                            carrito.items.removeProduct(producto);
-                        }
+                    let mensaje="El producto ya esta en el carrito de compras\n";
+                    mensaje+="1-Agregar mas unidades\n2-Restar Unidades\n3-Eliminar el producto del carrito";
+                    input=numberInput(mensaje);
+
+                    if (input===exitCode){
+                        continue;
+                    }else if (input===2){
+                        operador=-1;
+                    }else if (input===3){
+                        carrito.removeProduct(producto);
+                        productosSelec=carrito.items.show(this,"Productos Seleccionados\n");
+                        totalSelecc=`Total Parcial : $ ${carrito.roundedTotal}`;
                         continue;
                     }
                 }
@@ -354,15 +362,16 @@ while ((input=login())!=exitCode){
                 while ((input=numberInput("Ingrese la cantidad,cancelar para salir"))!=exitCode){
                     let cantidad=input;
                     if (cantidad>0){
+                        cantidad=cantidad*operador;
                         carrito.addProduct(producto,cantidad);
-                        productosSelec=carrito.items.show(this,"Productos Seleccionados");
-                        totalSelecc=`${carrito.roundedTotal}`;
+                        productosSelec=carrito.items.show(this,"Productos Seleccionados\n");
+                        totalSelecc=`Total Parcial : $ ${carrito.roundedTotal}`;
                         break;
                     }else{
                         alert("La cantidad debe ser mayor a 0.");
                     }
                 }
-                totalSelecc=`Total Parcial : $ ${carrito.roundedTotal}`;
+                
             }
 
         }
