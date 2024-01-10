@@ -36,7 +36,7 @@ class Producto{
     }
 
     show (){
-        return `${this.nombre} - $ ${this.precio}`
+        return `${this.codigo} - ${this.nombre} - $ ${this.precio}`
     }
 }
 
@@ -169,6 +169,8 @@ function stringInput(mensaje){
     }else if (input.trim()===""){
         alert("Debe Ingresar algun valor")
         return stringInput(mensaje);
+    }else{
+        return input;
     }
 }
 
@@ -226,7 +228,7 @@ const arrayShow = function(callback,valorInicial="") {
 
 const formaBusqueda="Buscar por :\n1-Codigo\n2-Nombre\n3-Precio\n4-Todos";
 
-function findProductByCodigo(codigo,productos){
+function findProductByCodigo(codigo){
     if (productos.length===0){
         return null;
     }else{
@@ -249,14 +251,14 @@ function productSearch(mensaje){
         }
     }else if (input===2){;
         while ((input=stringInput("Ingrese el nombre o parte del nombre a buscar"))!=exitCode){
-            if (input.trim().length<4){
+            if (input.trim().length<3){
                 alert("Debe ingresar al menos 3 caracteres");
             }else{
                 break;
             }
         }
         if (input===exitCode) return [];
-        productosFiltrados=productos.filter(p=> p.nombre.toLowerCase.includes(input));
+        productosFiltrados=productos.filter(p=> p.nombre.toLowerCase().includes(input));
     }else if (input===3){
         let precioDesde=numberInput("Ingrese el precio desde");
         if (precioDesde===exitCode) return [];
@@ -309,13 +311,13 @@ const exitCode="cancel";
 //Configuracion inicial
 const productosDestacados=productos.filter(p=> p.destacado).sort((a,b)=>sortAsc(a.nombre,b.nombre));
 let productosDestacadosString=productosDestacados.productosShow=arrayShow; 
-productosDestacados="Estos son los productos destacados de la semana\n" + productosDestacados.productosShow(this,"Productos Destacados\n");
+productosDestacadosString=productosDestacados.productosShow(this,"Estos son los productos destacados de la semana:\n");
 
 alert("Bienvenido a Pablo Winter Muebles");
 let input=0;
 while ((input=login())!=exitCode){
     let cliente=input;
-    alert(`Bienvenido ${cliente.nombre}\n` + productosDestacados);
+    alert(`Bienvenido ${cliente.nombre}\n` + productosDestacadosString);
     let total=0;
     let totalParcial="";
     let carrito=new Carrito();
@@ -324,21 +326,18 @@ while ((input=login())!=exitCode){
     let exit=false;
     while (exit===false){
         let productosEncontrados=productSearch("Busqueda de Productos");
+        if (productosEncontrados.length>0){
+            productosEncontrados.show=arrayShow;
+            alert(productosEncontrados.show(this,"Se encontraron los siguientes productos:\n"));
+        }
         let productosSelec="";
         let totalSelecc="";
         if (carrito.items.length>0){
             productosSelec=carrito.items.show(this,"Productos Seleccionados");
-            totalSelecc=`${carrito.roundedTotal()}`;
+            totalSelecc=`${carrito.roundedTotal}`;
         }
         while ((input=numberInput("Ingrese el codigo del Producto" + productosSelec + "\n" + totalSelecc))!=exitCode){
-            let tmpProd;
-            if (productosEncontrados!=exitCode){
-                tmpProd=productosEncontrados;
-            }else{
-                tmpProd=productos;
-            }
-            //todo ver si se duplica
-            let producto=tmpProd.find(p=> p.codigo===input);
+            let producto=productos.find(p=> p.codigo===input);
 
             if (producto!=null){
                 alert(`Ud Selecciono el producto ${producto.show()}`);
@@ -355,60 +354,63 @@ while ((input=login())!=exitCode){
                 while ((input=numberInput("Ingrese la cantidad,cancelar para salir"))!=exitCode){
                     let cantidad=input;
                     if (cantidad>0){
-                        if (carrito==null){
-                           
-                        }
                         carrito.addProduct(producto,cantidad);
                         break;
                     }else{
                         alert("La cantidad debe ser mayor a 0.");
                     }
                 }
-                totalParcial=`Total Parcial : $ ${carrito.roundedTotal()}`;
+                totalParcial=`Total Parcial : $ ${carrito.roundedTotal}`;
             }
 
         }
-    }
-    if (carrito.items.length===0){
-        alert("No se cargo ningun producto, volvera al menu inicial");
-        continue;
-    }else if (confirm("¿Confirma la compra?")===false){
-        continue;
-    }
-    let formaPago=null;
-    let salir=false;
-    while (!salir){
-        input=numberInput("Ingrese la forma de pago:1-CONTADO, 2-CUOTAS,cancelar para salir"); 
-        if (input===exitCode){
-            salir=true;
-        }else{
-            if ((formaPago=formasPago.find(f=> f.codigo===input))!=null){
+
+        if (carrito.items.length===0){
+            alert("No se cargo ningun producto, volvera al menu inicial");
+            continue;
+        }else if (confirm("¿Confirma la compra?")===false){
+            continue;
+        }
+        let formaPago=null;
+        let salir=false;
+        while (!salir){
+            input=numberInput("Ingrese la forma de pago:1-CONTADO, 2-CUOTAS,cancelar para salir"); 
+            if (input===exitCode){
                 salir=true;
-            }
-        }
-    }
-    if (formaPago===exitCode){
-        continue;
-    }
-    if (formaPago.codigo===1){
-        alert(`El total de su compra es $ ${carrito.roundedTotal()}`);
-    }else{
-        //"1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
-        let cuotas=0;
-        while (true){
-            cuotas=numberInput("Ingrese la cantidad de cuotas.\n" + opcionesCuotas);
-            if (cuotas!=1 && cuotas!=3 && cuotas!=6 && cuotas!=12){
-                alert("Numero de cuotas invalido");
             }else{
-                break;
+                if ((formaPago=formasPago.find(f=> f.codigo===input))!=null){
+                    salir=true;
+                }
             }
         }
-        let interes=intereses.find(i=>i.cantCuotas===cuotas).map(i=> i.interes);
-        
-        const calculoCuota=(monto,cuotas)=> (monto/cuotas) * (1 + interes);
-        let resultado=calcularMontoTotalEnCuotas(carrito.roundedTotal,cuotas,calculoCuota);
-        alert(`El total de su compra en ${cuotas} cuotas de $ ${resultado.valorCuota} es $ ${resultado.total}`);
+        if (formaPago===exitCode){
+            continue;
+        }
+        if (formaPago.codigo===1){
+            alert(`El total de su compra es $ ${carrito.roundedTotal}`);
+        }else{
+            //"1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
+            let cuotas=0;
+            while (true){
+                cuotas=numberInput("Ingrese la cantidad de cuotas.\n" + opcionesCuotas);
+                if (cuotas!=1 && cuotas!=3 && cuotas!=6 && cuotas!=12){
+                    alert("Numero de cuotas invalido");
+                }else{
+                    break;
+                }
+            }
+            let interes=intereses.find(i=>i.cantCuotas===cuotas).map(i=> i.interes);
+            
+            const calculoCuota=(monto,cuotas)=> (monto/cuotas) * (1 + interes);
+            let resultado=calcularMontoTotalEnCuotas(carrito.roundedTotal,cuotas,calculoCuota);
+            alert(`El total de su compra en ${cuotas} cuotas de $ ${resultado.valorCuota} es $ ${resultado.total}`);
+        }
+
+        if (!confirm("¿Desea realizar otra compra?")){
+            exit=true;
+        }
     }
+    
 }
 
 
