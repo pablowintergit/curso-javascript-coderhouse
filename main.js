@@ -320,9 +320,6 @@ while ((input=login())!=exitCode){
     let cliente=input;
     alert(`Bienvenido ${cliente.nombre}\n` + productosDestacadosString);
     let total=0;
-    let carrito=new Carrito();
-    carrito.items.show=arrayShow;
-    let canceloCargaPedidos=false;
     let exit=false;
     while (exit===false){
         input=productSearch("Busqueda de Productos\n");
@@ -335,6 +332,8 @@ while ((input=login())!=exitCode){
             productosEncontrados.show=arrayShow;
             alert(productosEncontrados.show(this,"Se encontraron los siguientes productos:\n"));
         }
+        let carrito=new Carrito();
+        carrito.items.show=arrayShow;
         let productosSelec="";
         let totalSelecc="";
         while ((input=numberInput("Ingrese el codigo del Producto\n" + productosSelec + "\n" + totalSelecc))!=exitCode){
