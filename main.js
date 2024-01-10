@@ -86,7 +86,7 @@ class Carrito{
     get roundedTotal(){
         let total=0;
         this.items.forEach(item=> total+=item.Importe);
-        round(this.total,2);
+        return round(total,2);
     }
 
 }
@@ -240,11 +240,11 @@ function findProductByCodigo(codigo){
 function productSearch(mensaje){    
     mensaje+=formaBusqueda;
     let input=numberInput(mensaje);
-    if (input===exitCode) return [];
+    if (input===exitCode) return exitCode;
     let productosFiltrados=[];
     if (input===1){
         input=numberInput("Ingrese el codigo a buscar");
-        if (input===exitCode) return [];
+        if (input===exitCode) return exitCode;
         let producto=findProductByCodigo(input);
         if (producto!=null){
             productosFiltrados.push(producto);
@@ -257,13 +257,13 @@ function productSearch(mensaje){
                 break;
             }
         }
-        if (input===exitCode) return [];
+        if (input===exitCode) return exitCode;
         productosFiltrados=productos.filter(p=> p.nombre.toLowerCase().includes(input));
     }else if (input===3){
         let precioDesde=numberInput("Ingrese el precio desde");
-        if (precioDesde===exitCode) return [];
+        if (precioDesde===exitCode) return exitCode;
         let precioHasta=numberInput("Ingrese el precio hasta");
-        if (precioHasta===exitCode) return [];
+        if (precioHasta===exitCode) return exitCode;
         productosFiltrados.filter(p=> p.precio>=precioDesde && p.precio<=precioHasta);
     }else{
         productosFiltrados=productos.slice();
@@ -319,24 +319,24 @@ while ((input=login())!=exitCode){
     let cliente=input;
     alert(`Bienvenido ${cliente.nombre}\n` + productosDestacadosString);
     let total=0;
-    let totalParcial="";
     let carrito=new Carrito();
     carrito.items.show=arrayShow;
     let canceloCargaPedidos=false;
     let exit=false;
     while (exit===false){
-        let productosEncontrados=productSearch("Busqueda de Productos");
+        input=productSearch("Busqueda de Productos");
+        if (input===exitCode){
+            exit=true;
+            continue;
+        }
+        let productosEncontrados=input;
         if (productosEncontrados.length>0){
             productosEncontrados.show=arrayShow;
             alert(productosEncontrados.show(this,"Se encontraron los siguientes productos:\n"));
         }
         let productosSelec="";
         let totalSelecc="";
-        if (carrito.items.length>0){
-            productosSelec=carrito.items.show(this,"Productos Seleccionados");
-            totalSelecc=`${carrito.roundedTotal}`;
-        }
-        while ((input=numberInput("Ingrese el codigo del Producto" + productosSelec + "\n" + totalSelecc))!=exitCode){
+        while ((input=numberInput("Ingrese el codigo del Producto\n" + productosSelec + "\n" + totalSelecc))!=exitCode){
             let producto=productos.find(p=> p.codigo===input);
 
             if (producto!=null){
@@ -355,12 +355,14 @@ while ((input=login())!=exitCode){
                     let cantidad=input;
                     if (cantidad>0){
                         carrito.addProduct(producto,cantidad);
+                        productosSelec=carrito.items.show(this,"Productos Seleccionados");
+                        totalSelecc=`${carrito.roundedTotal}`;
                         break;
                     }else{
                         alert("La cantidad debe ser mayor a 0.");
                     }
                 }
-                totalParcial=`Total Parcial : $ ${carrito.roundedTotal}`;
+                totalSelecc=`Total Parcial : $ ${carrito.roundedTotal}`;
             }
 
         }
@@ -392,15 +394,24 @@ while ((input=login())!=exitCode){
             //"1-2% Mensual.\n3-8% Mensual\n6-10% Mensual\n12-15% Mensual"
             let cuotas=0;
             while (true){
-                cuotas=numberInput("Ingrese la cantidad de cuotas.\n" + opcionesCuotas);
-                if (cuotas!=1 && cuotas!=3 && cuotas!=6 && cuotas!=12){
+                input=numberInput("Ingrese la cantidad de cuotas.\n" + opcionesCuotas);
+                if (input===exitCode){
+                    alert("Debe ingresar la cantidad de cuotas");
+                    continue;
+                }
+                
+                cuotas=input;
+                let interes=intereses.find(i=> i.cantCuotas===cuotas);
+
+                if (interes==null){
                     alert("Numero de cuotas invalido");
                 }else{
                     break;
                 }
+
             }
-            let interes=intereses.find(i=>i.cantCuotas===cuotas).map(i=> i.interes);
             
+            let interes=intereses.find(i=>i.cantCuotas===cuotas).interes;
             const calculoCuota=(monto,cuotas)=> (monto/cuotas) * (1 + interes);
             let resultado=calcularMontoTotalEnCuotas(carrito.roundedTotal,cuotas,calculoCuota);
             alert(`El total de su compra en ${cuotas} cuotas de $ ${resultado.valorCuota} es $ ${resultado.total}`);
