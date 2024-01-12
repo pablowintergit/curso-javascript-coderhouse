@@ -94,7 +94,10 @@ class Carrito{
 
     get roundedTotal(){
         let total=0;
-        this.items.forEach(item=> total+=item.Importe);
+        if (this.items.length>0){
+            total=this.items.reduce((a,b)=>a+=b.Importe,0);
+        }
+        //this.items.forEach(item=> total+=item.Importe);
         return round(total,2);
     }
 
