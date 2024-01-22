@@ -3,6 +3,8 @@ class Producto{
         this.codigo=params.codigo;
         this.nombre=params.nombre;
         this.imagen=params.imagen;
+        this.desc1=params.desc1;
+        this.desc2=params.desc2;
         this.precioOline=params.precioOnline;
         this.precioEfectivo=params.precioEfectivo;
     }
