@@ -1,7 +1,21 @@
-class Usuario{
+ class Persona{
+    constructor(nombre){
+        this.nombre=nombre;
+    }
+
+    sayHi(){
+        console.log(nombre);
+    }
+
+ }
+ 
+ 
+ class Usuario{
     constructor(nombre,password){
         this.nombre=nombre;
         this.password=password;
+        this.fecha=new Date().getTime();
+        this.persona=new Persona("Pedro");
     }
     
     sayHi(){
@@ -27,11 +41,17 @@ Usuario.fromJson=(json)=>{
     return new Usuario(json.nombre,json.password);
 }
 
+
 let usuario=new Usuario("juan","123");
 let usuarioJSON=JSON.stringify(usuario);
 
-let usuario2=Usuario.fromJson(JSON.parse(usuarioJSON));
+let obj=JSON.parse(usuarioJSON);
 
-usuario2.sayHi();
+//console.log(obj);
+//let us2=Object.assign(new Usuario(),obj);
+
+
+
+console.log(us2);
 
 
