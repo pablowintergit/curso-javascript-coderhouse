@@ -7,26 +7,26 @@ const productos=productosObject.map(p=> Producto.fromObject(p));
 
 
 function itemRender(item,container) {
-    const itemValues={
+    const {
         producto:{codigo,imagen,nombre,desc1,desc2,cantidad},
         Importe
-    }
+    }=item;
 
     let div=document.createElement("div");
     div.className="carrito-item";
-    div.setAttribute("id",`item-${item.producto.codigo}`);
-    div.setAttribute("data-product-id",item.producto.codigo);
+    div.setAttribute("id",`item-${codigo}`);
+    div.setAttribute("data-product-id",codigo);
     div.innerHTML=`
         <figure class="carrito-thumnbail">
-            <img src="./${item.producto.imagen}">
+            <img src="./${imagen}">
         </figure>
         <div>
-            <h2>${item.producto.nombre}</h2>
-            <p>${item.producto.desc1}</p>
-            <p>${item.producto.desc2}</p>
-            <p>Cantidad : ${item.cantidad} Importe: $ ${item.Importe}</p>
+            <h2>${nombre}</h2>
+            <p>${desc1}</p>
+            <p>${desc2}</p>
+            <p>Cantidad : ${cantidad} Importe: $ ${Importe}</p>
             <div class="carrito-actions">
-                <button id="btnEliminar-${item.producto.codigo}" type="button" data-product-id=${item.producto.codigo} class="btn btn-danger btn-eliminar-custom">Eliminar del Carrito</button>
+                <button id="btnEliminar-${codigo}" type="button" data-product-id=${codigo} class="btn btn-danger btn-eliminar-custom">Eliminar del Carrito</button>
             </div>
         </div>
     `;
@@ -34,7 +34,7 @@ function itemRender(item,container) {
     container.append(div);
 
     ////TODO:SEGUIR ACA CON EL DESCUENTO DE LOS PRODUCTOS
-    document.getElementById(`btnEliminar-${item.producto.codigo}`).addEventListener("click",(ev)=>{
+    document.getElementById(`btnEliminar-${codigo}`).addEventListener("click",(ev)=>{
         console.log(ev.target);
         
         let carritoJson=sessionStorage.getItem("carrito");
