@@ -7,6 +7,11 @@ const productos=productosObject.map(p=> Producto.fromObject(p));
 
 
 function itemRender(item,container) {
+    const itemValues={
+        producto:{codigo,imagen,nombre,desc1,desc2,cantidad},
+        Importe
+    }
+
     let div=document.createElement("div");
     div.className="carrito-item";
     div.setAttribute("id",`item-${item.producto.codigo}`);
@@ -32,17 +37,18 @@ function itemRender(item,container) {
     document.getElementById(`btnEliminar-${item.producto.codigo}`).addEventListener("click",(ev)=>{
         console.log(ev.target);
         
-        /* carritoJson=sessionStorage.getItem("carrito");
+        let carritoJson=sessionStorage.getItem("carrito");
         let carrito=Carrito.fromJson(carritoJson);
 
         let codigo=ev.target.getAttribute("data-product-id");
 
-        let producto=productos.find(p=> p.codigo==codigo);
-        
-        carrito.addProduct(producto,1);
-        
+        let parent=document.getElementById(`item-${codigo}`)
+
+        parent.remove();
+
+        carrito.removeProduct(codigo);
         sessionStorage.setItem("carrito",JSON.stringify(carrito));
-        console.log(sessionStorage.getItem("carrito")); */
+        
     });
     
 }

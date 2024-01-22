@@ -26,8 +26,8 @@ class Carrito{
         this.items=[];
     }
 
-    existeProducto(producto){
-        return this.items.find(i=> i.producto.codigo===producto.codigo)!=null;
+    existeProducto(codigo){
+        return this.items.find(i=> i.producto.codigo===codigo)!=null;
     }
 
     addProduct(producto,cantidad){
@@ -49,8 +49,8 @@ class Carrito{
         }
     }
 
-    removeProduct(producto,cantidad){
-        let item=this.items.find(i=> i.producto.codigo===producto.codigo);
+    removeProduct(codigo){
+        let item=this.items.find(i=> i.producto.codigo==codigo);
         if (item==null){
             return null;
         }else{
@@ -95,8 +95,6 @@ class ItemCompra {
 
         return itemCompra;
     }
-
-
 }
 
 

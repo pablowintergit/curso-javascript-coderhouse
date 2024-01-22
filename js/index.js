@@ -67,7 +67,6 @@ function productRender({codigo,nombre,imagen,desc1,desc2},container) {
         alert(`Producto : ${producto.nombre} agregado al carrito`);
 
         sessionStorage.setItem("carrito",JSON.stringify(carrito));
-        console.log(sessionStorage.getItem("carrito"));
     });
     
 }
