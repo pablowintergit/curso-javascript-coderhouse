@@ -66,7 +66,8 @@ main {
   align-items: center;
 }
 
-.company-section .company-thumbnail, .gallery-container figure, .card-product-detail-thumbnail, .header-info .logo, .product-thumbnail, #footerMedia .icon-image {
+.company-section .company-thumbnail, .gallery-container figure, .card-product-detail-thumbnail, .header-info .logo, .product-thumbnail, 
+#footerMedia .icon-image, .header-info .carrito-viewer {
   height: auto;
   overflow: auto;
 }
@@ -100,6 +101,17 @@ main {
 .header-info .logo img {
   height: 100%;
 }
+
+.header-info .carrito-viewer {
+  width: 100px;
+  aspect-ratio: 1/1;
+  border-radius: 15px;
+}
+.header-info .carrito-viewer img {
+  height: 100%;
+}
+
+
 @media screen and (max-width: 576px) {
   .header-info {
     display: flex;
