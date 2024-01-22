@@ -14,7 +14,7 @@ class Producto{
     }
 
     static fromObject(object){
-        return Object(new Producto(),object);
+        return new Producto(object);
     }
 
 }
@@ -71,7 +71,9 @@ class Carrito{
     }
 
     static fromObject(object){
-        return Object(new Carrito(),object);
+        let carrito=Object.assign(new Carrito,object);
+        carrito.items=carrito.items.map(item=> ItemCompra.fromObject(item));
+        return carrito;
     }
 }
 
@@ -84,6 +86,14 @@ class ItemCompra {
     get Importe(){
         return round(this.producto.precioOline * this.cantidad,2);
     }
+
+    static fromObject(object){
+        let itemCompra=Object.assign(new ItemCompra,object);
+        this.producto=new Producto(object);
+
+        return itemCompra;
+    }
+
 
 }
 

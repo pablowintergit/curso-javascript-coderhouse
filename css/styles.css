@@ -1240,4 +1240,39 @@ main {
   margin-bottom: 5px;
 }
 
-/*# sourceMappingURL=styles.css.map */
+.carrito-item{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    column-gap: 20px;
+    padding: 20px;
+    border: 1px solid gray;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: fit-content;
+}
+
+.carrito-item .carrito-thumnbail{
+  width: 150px;
+  aspect-ratio: 1/1;
+}
+
+.carrito-thumnbail img{
+    width: 100%;
+    object-fit: cover;
+}
+
+.carrito-actions{
+    display:flex;
+    width: 100%;
+    justify-content: end;
+    align-items: end;
+}
+
+.btn-eliminar-custom{
+  font-size: 0.8rem;
+  margin-top: 50px;  
+}
+

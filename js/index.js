@@ -20,8 +20,10 @@ productosToPersist.push(new Producto({codigo:350,nombre:"Cama Minimalist de 2 pl
 
 productosToPersist.push(new Producto({codigo:370,nombre:"Cama Fragancia de 2 plazas",imagen:"assets/beds/images/bed-5.jpg",precioOnline:157127,desc1:"Precio online $157.127",desc2:"20% OFF en Efectivo $125.702"}));
 
-productosToPersist.push(new Producto({codigo:1,nombre:"Cama Royale de Roble",imagen:"product-detalis/bed.html",precioOnline:200127,desc1:"Precio online $200.127",desc2:"20% OFF en Efectivo $125.702"}));
+productosToPersist.push(new Producto({codigo:357,nombre:"Cama Royale de Roble",imagen:"assets/beds/images/bed-7.jpg",precioOnline:200127,desc1:"Precio online $200.127",desc2:"20% OFF en Efectivo $125.702"}));
 
+//Variables locales
+let carrito=null;
 //funciones locales
 function productRender({codigo,nombre,imagen,desc1,desc2},container) {
     let div=document.createElement("div");
@@ -30,7 +32,7 @@ function productRender({codigo,nombre,imagen,desc1,desc2},container) {
     div.setAttribute("data-product-id",codigo);
     div.innerHTML=`
     <div class="card-product-list" >
-        <a href="#">
+       
             <figure class="product-thumbnail">
                 <img src="./${imagen}" alt="${nombre}">
             </figure>
@@ -38,19 +40,36 @@ function productRender({codigo,nombre,imagen,desc1,desc2},container) {
                 <span>${nombre}</span>
                 <h3>${desc1}</h3>
                 <p>${desc2}</p>
-                <button id="btnAddToCart-${codigo}" class="btn btn-primary btn-add-to-cart" type="button">Añadir al carrito</button>
+                <button id="btnAddToCart-${codigo}" data-product-id=${codigo} class="btn btn-primary btn-add-to-cart" type="button">Añadir al carrito</button>
             </div>
-        </a>
+       
     </div>
     `;
 
     container.append(div);
 
-    /*
-    document.getElementById("btnAddToCart-${codigo}").addEventListener("click",(ev)=>{
+    
+    document.getElementById(`btnAddToCart-${codigo}`).addEventListener("click",(ev)=>{
+        let carritoJson=sessionStorage.getItem("carrito");
+        
+        let codigo=ev.target.getAttribute("data-product-id");
 
+        let producto=productos.find(p=> p.codigo==codigo);
+        
+        if (carritoJson!=null){
+            carrito=Carrito.fromJson(carritoJson);
+        }else{
+            carrito=new Carrito();
+        }
+
+        carrito.addProduct(producto,1);
+        
+        alert(`Producto : ${producto.nombre} agregado al carrito`);
+
+        sessionStorage.setItem("carrito",JSON.stringify(carrito));
+        console.log(sessionStorage.getItem("carrito"));
     });
-    */
+    
 }
 function productsRender(productos){
     const container=document.getElementById("products-container-id");
@@ -65,6 +84,7 @@ localStorage.setItem("productos",JSON.stringify(productosToPersist));
 //Renderizar productos
 let json=localStorage.getItem("productos");
 const productosObject=JSON.parse(json);
+
 const productos=productosObject.map(p=> Producto.fromObject(p));
 
 productsRender(productos);
