@@ -33,7 +33,6 @@ function itemRender(item,container) {
 
     container.append(div);
 
-    ////TODO:SEGUIR ACA CON EL DESCUENTO DE LOS PRODUCTOS
     document.getElementById(`btnEliminar-${codigo}`).addEventListener("click",(ev)=>{
         console.log(ev.target);
         
