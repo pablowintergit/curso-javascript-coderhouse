@@ -1,3 +1,5 @@
+import { round } from "./functions.js";
+
 class Producto{
     constructor(params){
         this.codigo=params.codigo;
@@ -5,7 +7,7 @@ class Producto{
         this.imagen=params.imagen;
         this.desc1=params.desc1;
         this.desc2=params.desc2;
-        this.precioOline=params.precioOnline;
+        this.precioOnline=params.precioOnline;
         this.precioEfectivo=params.precioEfectivo;
     }
 
@@ -61,7 +63,7 @@ class Carrito{
     get roundedTotal(){
         let total=0;
         if (this.items.length>0){
-            total=this.items.reduce((a,b)=>a+=b.Importe,0);
+            total=this.items.reduce((a,b)=> a + b.Importe,0);
         }
         return round(total,2);
     }
@@ -84,7 +86,7 @@ class ItemCompra {
     }
 
     get Importe(){
-        return round(this.producto.precioOline * this.cantidad,2);
+        return round(this.producto.precioOnline * this.cantidad,2);
     }
 
     static fromObject(object){

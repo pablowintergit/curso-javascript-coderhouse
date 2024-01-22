@@ -1,7 +1,5 @@
 import {Producto,Carrito,ItemCompra} from "./modules/clases.js";
 
-let carritoJson=null;
-
 let json=localStorage.getItem("productos");
 const productosObject=JSON.parse(json);
 
@@ -11,8 +9,8 @@ const productos=productosObject.map(p=> Producto.fromObject(p));
 function itemRender(item,container) {
     let div=document.createElement("div");
     div.className="carrito-item";
-    div.setAttribute("id",`item-${codigo}`);
-    div.setAttribute("data-product-id",codigo);
+    div.setAttribute("id",`item-${item.producto.codigo}`);
+    div.setAttribute("data-product-id",item.producto.codigo);
     div.innerHTML=`
         <figure class="carrito-thumnbail">
             <img src="./${item.producto.imagen}">
@@ -31,7 +29,7 @@ function itemRender(item,container) {
     container.append(div);
 
     ////TODO:SEGUIR ACA CON EL DESCUENTO DE LOS PRODUCTOS
-    document.getElementById(`btnEliminar-${codigo}`).addEventListener("click",(ev)=>{
+    document.getElementById(`btnEliminar-${item.producto.codigo}`).addEventListener("click",(ev)=>{
         console.log(ev.target);
         
         /* carritoJson=sessionStorage.getItem("carrito");
@@ -56,9 +54,9 @@ function itemsRender(items){
     });
 }
 
-carritoJson=sessionStorage.getItem("carrito");
+let carritoJson=sessionStorage.getItem("carrito");
 
-if (carritoJson=!null){
+if (carritoJson!=null){
     let carrito=Carrito.fromJson(carritoJson);
-    itemsRender(carrito);
+    itemsRender(carrito.items);
 }
