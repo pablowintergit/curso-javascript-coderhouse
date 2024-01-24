@@ -68,6 +68,12 @@ class Carrito{
         return round(total,2);
     }
 
+    get cantidadTotal(){
+        let total=this.items.reduce((a,b)=> a + b.cantidad,0);
+        total=total || 0;
+        return total;
+    }
+
     static fromJson(json){
         return Carrito.fromObject(JSON.parse(json));
     }

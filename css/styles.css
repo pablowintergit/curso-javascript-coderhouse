@@ -1276,3 +1276,21 @@ main {
   margin-top: 50px;  
 }
 
+.carrito-info-show{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background-color: #3CC4EA;
+  color: white;
+  border-radius: 50%;
+  z-index: 1000;
+  position: relative;
+  left: 70px;
+  top:-25px;
+}
+
+.carrito-info-hide{
+    display: none;
+}

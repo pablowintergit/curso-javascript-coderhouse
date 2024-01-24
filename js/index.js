@@ -1,4 +1,5 @@
 import {Producto,Carrito,ItemCompra} from "./modules/clases.js" 
+import { showNotificacion } from "./modules/functions.js";
 
 //Base de datos
 const productosToPersist=[]
@@ -66,10 +67,13 @@ function productRender({codigo,nombre,imagen,desc1,desc2},container) {
         
         alert(`Producto : ${producto.nombre} agregado al carrito`);
 
+        showNotificacion(carrito);
+
         sessionStorage.setItem("carrito",JSON.stringify(carrito));
     });
     
 }
+
 function productsRender(productos){
     const container=document.getElementById("products-container-id");
     productos.forEach(producto => {
@@ -88,3 +92,8 @@ const productos=productosObject.map(p=> Producto.fromObject(p));
 
 productsRender(productos);
 
+let carritoJson=sessionStorage.getItem("carrito");
+if (carritoJson!=null){
+    carrito=Carrito.fromJson(carritoJson);
+    showNotificacion(carrito);
+}

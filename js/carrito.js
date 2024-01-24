@@ -1,4 +1,5 @@
 import {Producto,Carrito,ItemCompra} from "./modules/clases.js";
+import { showNotificacion } from "./modules/functions.js";
 
 let json=localStorage.getItem("productos");
 const productosObject=JSON.parse(json);
@@ -50,6 +51,8 @@ function itemRender(item,container) {
         
         mostrarTotal(carrito);
         
+        showNotificacion(carrito);
+
         sessionStorage.setItem("carrito",JSON.stringify(carrito));
         
     });
@@ -87,4 +90,5 @@ let carritoJson=sessionStorage.getItem("carrito");
 if (carritoJson!=null){
     let carrito=Carrito.fromJson(carritoJson);
     carritoRender(carrito);
+    showNotificacion(carrito);
 }
