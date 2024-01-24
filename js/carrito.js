@@ -8,7 +8,8 @@ const productos=productosObject.map(p=> Producto.fromObject(p));
 
 function itemRender(item,container) {
     const {
-        producto:{codigo,imagen,nombre,desc1,desc2,cantidad},
+        producto:{codigo,imagen,nombre,desc1,desc2},
+        cantidad,
         Importe
     }=item;
 
@@ -46,22 +47,44 @@ function itemRender(item,container) {
         parent.remove();
 
         carrito.removeProduct(codigo);
+        
+        mostrarTotal(carrito);
+        
         sessionStorage.setItem("carrito",JSON.stringify(carrito));
         
     });
     
 }
 
-function itemsRender(items){
+function mostrarTotal(carrito){
+    let section=document.getElementById("section-container");
+    let div=document.getElementById("div-total");
+
+    if (div==null){
+        div=document.createElement("div");
+        div.setAttribute("id","div-total")
+        section.append(div);
+    }
+    
+    if (carrito.roundedTotal>0){
+        div.innerHTML=`<h2>El total de su compra es $ ${carrito.roundedTotal}</h2>`;
+    }else{
+        div.remove();
+    }
+}
+
+
+function carritoRender(carrito){
     const container=document.getElementById("contenedor");
-    items.forEach(item => {
+    carrito.items.forEach(item => {
         itemRender(item,container);
     });
+    mostrarTotal(carrito);
 }
 
 let carritoJson=sessionStorage.getItem("carrito");
 
 if (carritoJson!=null){
     let carrito=Carrito.fromJson(carritoJson);
-    itemsRender(carrito.items);
+    carritoRender(carrito);
 }
