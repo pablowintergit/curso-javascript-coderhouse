@@ -64,8 +64,16 @@ function productRender({codigo,nombre,imagen,desc1,desc2},container) {
         }
 
         carrito.addProduct(producto,1);
-        
-        alert(`Producto : ${producto.nombre} agregado al carrito`);
+    
+        Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: `${producto.nombre} agregado al carrito`,
+                showConfirmButton: false,
+                timer: 2000,
+                width: "300px",
+                height: "300px",
+            });
 
         showNotificacion(carrito);
 

@@ -43,20 +43,34 @@ function itemRender(item,container) {
 
         let codigo=ev.target.getAttribute("data-product-id");
 
-        let parent=document.getElementById(`item-${codigo}`)
+        Swal.fire({
+            title: "Está seguro de eliminar el producto?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí",
+            cancelButtonText: "No",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let parent=document.getElementById(`item-${codigo}`)
 
-        parent.remove();
+                parent.remove();
 
-        carrito.removeProduct(codigo);
+                carrito.removeProduct(codigo);
         
-        mostrarTotal(carrito);
+                mostrarTotal(carrito);
         
-        showNotificacion(carrito);
+                showNotificacion(carrito);
 
-        sessionStorage.setItem("carrito",JSON.stringify(carrito));
-        
+                sessionStorage.setItem("carrito",JSON.stringify(carrito));
+
+                Swal.fire({
+                    title: "Eliminar producto",
+                    icon: "success",
+                    text: "Producto eliminado del carrito",
+                });
+            }
+        });       
     });
-    
 }
 
 function mostrarTotal(carrito){
